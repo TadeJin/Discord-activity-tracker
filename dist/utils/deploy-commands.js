@@ -6,7 +6,7 @@ const discord_js_1 = require("discord.js");
 const commands = [
     {
         name: "update_commands",
-        description: "Updates commands, including their options"
+        description: "Updates commands, including their options",
     },
     {
         name: "add_user",
@@ -16,10 +16,30 @@ const commands = [
                 name: "user",
                 description: "Specifies which user to be added",
                 type: discord_js_1.ApplicationCommandOptionType.User,
-                required: true
-            }
-        ]
-    }
+                required: true,
+            },
+        ],
+    },
+    {
+        name: "remove_user",
+        description: "Removes user from tracking",
+        options: [
+            {
+                name: "user",
+                description: "Specifies which user to be removed",
+                type: discord_js_1.ApplicationCommandOptionType.User,
+                required: true,
+            },
+        ],
+    },
+    {
+        name: "show_week_overview",
+        description: "Shows the current week overview",
+    },
+    {
+        name: "show_month_overview",
+        description: "Shows the month week overview",
+    },
 ];
 const updateCommands = () => {
     const botID = process.env.BOT_ID;
@@ -31,7 +51,7 @@ const updateCommands = () => {
             try {
                 console.log("Registering commands");
                 await rest.put(discord_js_1.Routes.applicationGuildCommands(botID, serverID), {
-                    body: commands
+                    body: commands,
                 });
                 console.log("Commands loaded");
             }

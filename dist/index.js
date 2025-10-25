@@ -1,15 +1,14 @@
 "use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.client = void 0;
 require("dotenv/config");
 const discord_js_1 = require("discord.js");
 const dataManager_1 = require("./utils/dataManager");
 const deploy_commands_1 = require("./utils/deploy-commands");
-const fs_1 = __importDefault(require("fs"));
-const path_1 = __importDefault(require("path"));
-const client = new discord_js_1.Client({
+const statisticsManager_1 = require("./utils/statisticsManager");
+const constants_1 = require("./utils/constants");
+const scheduler_1 = require("./utils/scheduler");
+exports.client = new discord_js_1.Client({
     intents: [
         discord_js_1.IntentsBitField.Flags.Guilds,
         discord_js_1.IntentsBitField.Flags.GuildMembers,
@@ -18,47 +17,84 @@ const client = new discord_js_1.Client({
         discord_js_1.IntentsBitField.Flags.GuildVoiceStates,
     ],
 });
-client.on("clientReady", (c) => {
+exports.client.on("clientReady", (c) => {
     console.log(`${c.user.tag} is online.`);
 });
-client.on("messageCreate", (message) => {
+//Chat commands
+exports.client.on("messageCreate", (message) => {
     if (message.author.bot) {
         return;
     }
     else if (message.content === ".initialize-commands") {
+        //Initializes new commands
         (0, deploy_commands_1.updateCommands)();
-        message.reply("Commans initialized!");
-    }
-    else if (message.content === ".readData") {
-        // readData();
-        const filePath = path_1.default.join(__dirname, "botConfig", "userTimes.json");
-        const userTimes = fs_1.default.readFileSync(filePath, "utf-8");
-        console.log(userTimes);
-        message.reply("Read!");
-    }
-    else if (message.content === ".off") {
-        message.reply("*OFF*");
-        client.destroy();
+        message.reply("Commands initialized!");
     }
 });
-client.on("interactionCreate", (interaction) => {
+//Interactions
+exports.client.on("interactionCreate", async (interaction) => {
     if (!interaction.isChatInputCommand())
         return;
     if (interaction.commandName == "hey") {
+        //Hello command
         interaction.reply("Hello!");
     }
     else if (interaction.commandName == "update_commands") {
+        //Update commands
         (0, deploy_commands_1.updateCommands)();
         interaction.reply("Commands updated!");
     }
     else if (interaction.commandName == "add_user") {
+        //Add user
         const chosenUser = interaction.options.getUser("user");
         if (!chosenUser) {
             interaction.reply("No name provided");
         }
         else {
-            (0, dataManager_1.addNewUser)(chosenUser.id) ? interaction.reply(`User ${chosenUser} added`) : interaction.reply("Error adding user!");
+            (0, dataManager_1.addNewUser)(chosenUser.id)
+                ? interaction.reply(`User ${chosenUser} added`)
+                : interaction.reply("Error adding user!");
+        }
+    }
+    else if (interaction.commandName == "remove_user") {
+        //Remove user
+        const chosenUser = interaction.options.getUser("user");
+        if (!chosenUser) {
+            interaction.reply("No name provided");
+        }
+        else {
+            (0, dataManager_1.removeUser)(chosenUser.id)
+                ? interaction.reply(`User ${chosenUser} removed`)
+                : interaction.reply("Error removing user!");
+        }
+    }
+    else if (interaction.commandName == "show_week_overview") {
+        //Displays week overview
+        (await (0, statisticsManager_1.showWeekStatistic)().then())
+            ? interaction.reply(`Weekly statistic sent to <#${process.env.CHANNEL_ID}>!`)
+            : interaction.reply("Error sending statistic!");
+    }
+    else if (interaction.commandName == "show_month_overview") {
+        //Displays month overview
+        (await (0, statisticsManager_1.showMonthStatistic)().then())
+            ? interaction.reply(`Monthly statistic sent to <#${process.env.CHANNEL_ID}>!`)
+            : interaction.reply("Error sending statistic!");
+    }
+});
+//VoiceState listener
+exports.client.on("voiceStateUpdate", (oldState, newState) => {
+    if (oldState.member && newState.member) {
+        if (!(newState.member.id in (0, dataManager_1.getJSONContent)(constants_1.USER_TIMES_PATH)))
+            return;
+        if (!oldState.channel && newState.channel) {
+            //New join
+            (0, dataManager_1.addJoinTime)(oldState.member.id, new Date());
+        }
+        if (oldState.channel && !newState.channel) {
+            //Leaves channel
+            (0, dataManager_1.addUserTime)(oldState.member.id, new Date());
         }
     }
 });
-client.login(process.env.BOT_TOKEN);
+(0, scheduler_1.startScheduler)();
+exports.client.login(process.env.BOT_TOKEN);
