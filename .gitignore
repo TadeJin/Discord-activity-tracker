@@ -1,3 +1,4 @@
 .env
-/botConfig/botConfig.json
+/botConfig/
 /node_modules
+.prettierrc
