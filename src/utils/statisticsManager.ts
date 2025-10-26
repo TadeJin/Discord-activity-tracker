@@ -15,7 +15,7 @@ export const showWeekStatistic = async (): Promise<boolean> => {
 
             for (const userID in userTime) {
                 const usertimeSpent = Number(userTime[userID].time);
-                message += `<@${userID}> spent ${formatTimeData(
+                message += `<@${userID}> spent${formatTimeData(
                     usertimeSpent
                 )} in call\n`;
                 total += usertimeSpent;
@@ -44,14 +44,17 @@ export const showMonthStatistic = async (): Promise<boolean> => {
     //Returns the monthly sum message
     try {
         const monthlyTime = getJSONContent(MONTH_TIMES_PATH) as monthlyTimeJSON;
+        const userTime = getJSONContent(USER_TIMES_PATH) as userTimeJSON;
 
-        if (monthlyTime) {
+        if (monthlyTime && userTime) {
             let message = "Hello! The monthly sum of calls is here:\n";
             let total = 0;
 
             for (const userID in monthlyTime) {
-                const usertimeSpent = Number(monthlyTime[userID].time);
-                message += `<@${userID}> spent ${formatTimeData(
+                const usertimeSpent =
+                    Number(monthlyTime[userID].time) +
+                    Number(userTime[userID].time);
+                message += `<@${userID}>spent ${formatTimeData(
                     usertimeSpent
                 )} in call\n`;
                 total += usertimeSpent;
@@ -167,8 +170,11 @@ const formatTimeData = (data: number): string => {
     if (data != 0) {
         seconds = data;
     }
-
-    return `${hours > 0 ? hours + " hours " : ""} ${
-        minutes > 0 ? minutes + " minutes " : ""
-    }${seconds > 0 ? seconds + " seconds" : ""}`;
+    if (hours == 0 && minutes == 0 && seconds == 0) {
+        return "NO_DATA";
+    } else {
+        return `${hours > 0 ? hours + " hours " : ""} ${
+            minutes > 0 ? minutes + " minutes " : ""
+        }${seconds > 0 ? seconds + " seconds" : ""}`;
+    }
 };

@@ -9,7 +9,8 @@ const constants_1 = require("./constants");
 const getJSONContent = (filePath) => {
     try {
         const fileContent = fs_1.default.readFileSync(filePath, "utf-8").trim();
-        return fileContent ? JSON.parse(fileContent) : {};
+        const jsonObj = fileContent ? JSON.parse(fileContent) : {};
+        return jsonObj;
     }
     catch (error) {
         console.error(error);
@@ -18,25 +19,49 @@ const getJSONContent = (filePath) => {
 };
 exports.getJSONContent = getJSONContent;
 const createFolderIfNotExists = (folderPath) => {
-    if (!fs_1.default.existsSync(folderPath)) {
-        fs_1.default.mkdirSync(folderPath, { recursive: true });
+    try {
+        if (!fs_1.default.existsSync(folderPath)) {
+            fs_1.default.mkdirSync(folderPath, { recursive: true });
+        }
+        return true;
+    }
+    catch (error) {
+        console.error(error);
+        return false;
     }
 };
 exports.createFolderIfNotExists = createFolderIfNotExists;
 const createFileIfNotExists = (filePath) => {
-    if (!fs_1.default.existsSync(filePath)) {
-        fs_1.default.writeFileSync(filePath, JSON.stringify({}), "utf-8");
+    try {
+        if (!fs_1.default.existsSync(filePath)) {
+            fs_1.default.writeFileSync(filePath, JSON.stringify({}), "utf-8");
+        }
+        return true;
+    }
+    catch (error) {
+        console.error(error);
+        return false;
     }
 };
 exports.createFileIfNotExists = createFileIfNotExists;
 //Tracking call time
 const addJoinTime = (userID, time) => {
-    const userTimes = (0, exports.getJSONContent)(constants_1.USER_TIMES_PATH);
-    userTimes[userID] = {
-        time: userTimes[userID].time,
-        join_time: time,
-    };
-    fs_1.default.writeFileSync(constants_1.USER_TIMES_PATH, JSON.stringify(userTimes), "utf-8");
+    try {
+        const userTimes = (0, exports.getJSONContent)(constants_1.USER_TIMES_PATH);
+        if (userTimes) {
+            userTimes[userID] = {
+                time: userTimes[userID].time,
+                join_time: time,
+            };
+            fs_1.default.writeFileSync(constants_1.USER_TIMES_PATH, JSON.stringify(userTimes), "utf-8");
+            return true;
+        }
+        return false;
+    }
+    catch (error) {
+        console.error(error);
+        return false;
+    }
 };
 exports.addJoinTime = addJoinTime;
 const addUserTime = (userID, timeLeft) => {
@@ -53,6 +78,7 @@ const addUserTime = (userID, timeLeft) => {
             join_time: "",
         };
         fs_1.default.writeFileSync(constants_1.USER_TIMES_PATH, JSON.stringify(userTimes), "utf-8");
+        return true;
     }
     catch (error) {
         console.log(error);
@@ -64,10 +90,9 @@ exports.addUserTime = addUserTime;
 //NEW USER
 const addNewUser = (userID) => {
     try {
-        (0, exports.createFolderIfNotExists)(constants_1.CONFIG_FOLDER_PATH);
-        addUserToTime(userID);
-        addUserToMonth(userID);
-        return true;
+        return ((0, exports.createFolderIfNotExists)(constants_1.DATA_FOLDER_PATH) &&
+            addUserToTime(userID) &&
+            addUserToMonth(userID));
     }
     catch (error) {
         console.log(error);
@@ -94,6 +119,7 @@ const addUserToTime = (userID) => {
         const userTimes = (0, exports.getJSONContent)(constants_1.USER_TIMES_PATH);
         userTimes[userID] = { time: "0", join_time: "" };
         fs_1.default.writeFileSync(constants_1.USER_TIMES_PATH, JSON.stringify(userTimes), "utf-8");
+        return true;
     }
     catch (error) {
         console.error(error);
@@ -103,20 +129,26 @@ const addUserToTime = (userID) => {
 //REMOVING USER
 const removeUser = (userID) => {
     try {
-        removeUserFromJSON(userID, constants_1.USER_TIMES_PATH);
-        removeUserFromJSON(userID, constants_1.MONTH_TIMES_PATH);
+        return (removeUserFromJSON(userID, constants_1.USER_TIMES_PATH) &&
+            removeUserFromJSON(userID, constants_1.MONTH_TIMES_PATH));
     }
     catch (error) {
         console.log(error);
         return false;
     }
-    return true;
 };
 exports.removeUser = removeUser;
 const removeUserFromJSON = (userID, filepath) => {
-    const userTimes = (0, exports.getJSONContent)(filepath);
-    if (!userTimes[userID])
+    try {
+        const userTimes = (0, exports.getJSONContent)(filepath);
+        if (!userTimes[userID])
+            return false;
+        delete userTimes[userID];
+        fs_1.default.writeFileSync(filepath, JSON.stringify(userTimes), "utf-8");
+        return true;
+    }
+    catch (error) {
+        console.error(error);
         return false;
-    delete userTimes[userID];
-    fs_1.default.writeFileSync(filepath, JSON.stringify(userTimes), "utf-8");
+    }
 };

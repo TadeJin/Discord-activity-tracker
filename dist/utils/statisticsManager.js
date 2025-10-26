@@ -3,47 +3,56 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.addWeeklySum = exports.clearTimeValuesOfUsers = exports.showMonthStatistic = exports.showWeekStatistic = void 0;
+exports.sendDebugMessage = exports.sendMessageToChannel = exports.addWeeklySum = exports.clearTimeValuesOfUsers = exports.showMonthStatistic = exports.showWeekStatistic = void 0;
 const __1 = require("..");
 const dataManager_1 = require("./dataManager");
 const fs_1 = __importDefault(require("fs"));
 const constants_1 = require("./constants");
 const showWeekStatistic = async () => {
     //Returns the weekly sum message
-    const userTime = (0, dataManager_1.getJSONContent)(constants_1.USER_TIMES_PATH);
-    if (userTime) {
-        let message = "Hello! The weekly sum of calls is here:\n";
-        let total = 0;
-        for (const userID in userTime) {
-            const usertimeSpent = Number(userTime[userID].time);
-            message += `<@${userID}> spent ${formatTimeData(usertimeSpent)} in call\n`;
-            total += usertimeSpent;
+    try {
+        const userTime = (0, dataManager_1.getJSONContent)(constants_1.USER_TIMES_PATH);
+        if (userTime) {
+            let message = "Hello! The weekly sum of calls is here:\n";
+            let total = 0;
+            for (const userID in userTime) {
+                const usertimeSpent = Number(userTime[userID].time);
+                message += `<@${userID}> spent${formatTimeData(usertimeSpent)} in call\n`;
+                total += usertimeSpent;
+            }
+            message += `Total time spend in call this week is ${formatTimeData(total)}. Thanks for your attention :)`;
+            if (process.env.CHANNEL_ID) {
+                return await (0, exports.sendMessageToChannel)(message, process.env.CHANNEL_ID);
+            }
         }
-        message += `Total time spend in call this week is ${formatTimeData(total)}. Thanks for your attention :)`;
-        if (process.env.CHANNEL_ID) {
-            return await sendMessageToChannel(message, process.env.CHANNEL_ID);
-        }
+        return false;
     }
-    return false;
+    catch (error) {
+        console.error(error);
+        return false;
+    }
 };
 exports.showWeekStatistic = showWeekStatistic;
 const showMonthStatistic = async () => {
     //Returns the monthly sum message
     try {
         const monthlyTime = (0, dataManager_1.getJSONContent)(constants_1.MONTH_TIMES_PATH);
-        if (monthlyTime) {
+        const userTime = (0, dataManager_1.getJSONContent)(constants_1.USER_TIMES_PATH);
+        if (monthlyTime && userTime) {
             let message = "Hello! The monthly sum of calls is here:\n";
             let total = 0;
             for (const userID in monthlyTime) {
-                const usertimeSpent = Number(monthlyTime[userID].time);
-                message += `<@${userID}> spent ${formatTimeData(usertimeSpent)} in call\n`;
+                const usertimeSpent = Number(monthlyTime[userID].time) +
+                    Number(userTime[userID].time);
+                message += `<@${userID}>spent ${formatTimeData(usertimeSpent)} in call\n`;
                 total += usertimeSpent;
             }
             message += `Total time spend in call this month is ${formatTimeData(total)}. Thanks for your attention :)`;
             if (process.env.CHANNEL_ID) {
-                return await sendMessageToChannel(message, process.env.CHANNEL_ID);
+                return await (0, exports.sendMessageToChannel)(message, process.env.CHANNEL_ID);
             }
         }
+        return false;
     }
     catch (error) {
         console.error(error);
@@ -97,6 +106,18 @@ message, channelID) => {
     }
     return false;
 };
+exports.sendMessageToChannel = sendMessageToChannel;
+const sendDebugMessage = (successMessage, errorMessage, condition) => {
+    if (process.env.DEBUG_CHANNEL_ID) {
+        if (condition) {
+            (0, exports.sendMessageToChannel)(successMessage, process.env.DEBUG_CHANNEL_ID);
+        }
+        else {
+            (0, exports.sendMessageToChannel)(errorMessage, process.env.DEBUG_CHANNEL_ID);
+        }
+    }
+};
+exports.sendDebugMessage = sendDebugMessage;
 const formatTimeData = (data) => {
     //Formats time data to hours minutes and seconds
     let hours = 0;
@@ -113,5 +134,10 @@ const formatTimeData = (data) => {
     if (data != 0) {
         seconds = data;
     }
-    return `${hours > 0 ? hours + " hours " : ""} ${minutes > 0 ? minutes + " minutes " : ""}${seconds > 0 ? seconds + " seconds" : ""}`;
+    if (hours == 0 && minutes == 0 && seconds == 0) {
+        return "NO_DATA";
+    }
+    else {
+        return `${hours > 0 ? hours + " hours " : ""} ${minutes > 0 ? minutes + " minutes " : ""}${seconds > 0 ? seconds + " seconds" : ""}`;
+    }
 };

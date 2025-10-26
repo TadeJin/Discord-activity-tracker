@@ -19,6 +19,12 @@ exports.client = new discord_js_1.Client({
 });
 exports.client.on("clientReady", (c) => {
     console.log(`${c.user.tag} is online.`);
+    // Automatic statistics printing (disable by commenting out)
+    (0, statisticsManager_1.sendDebugMessage)("Automatic statistics enabled", "Error starting automatic statistics", (0, scheduler_1.startScheduler)());
+    const createBotDataIfNotExists = (0, dataManager_1.createFolderIfNotExists)(constants_1.DATA_FOLDER_PATH) &&
+        (0, dataManager_1.createFileIfNotExists)(constants_1.USER_TIMES_PATH) &&
+        (0, dataManager_1.createFileIfNotExists)(constants_1.MONTH_TIMES_PATH);
+    (0, statisticsManager_1.sendDebugMessage)("Data is correct", "Error creating files", createBotDataIfNotExists);
 });
 //Chat commands
 exports.client.on("messageCreate", (message) => {
@@ -41,8 +47,9 @@ exports.client.on("interactionCreate", async (interaction) => {
     }
     else if (interaction.commandName == "update_commands") {
         //Update commands
-        (0, deploy_commands_1.updateCommands)();
-        interaction.reply("Commands updated!");
+        (await (0, deploy_commands_1.updateCommands)())
+            ? interaction.reply("Commands updated!")
+            : interaction.reply("Error updating commands!");
     }
     else if (interaction.commandName == "add_user") {
         //Add user
@@ -70,13 +77,13 @@ exports.client.on("interactionCreate", async (interaction) => {
     }
     else if (interaction.commandName == "show_week_overview") {
         //Displays week overview
-        (await (0, statisticsManager_1.showWeekStatistic)().then())
+        (await (0, statisticsManager_1.showWeekStatistic)())
             ? interaction.reply(`Weekly statistic sent to <#${process.env.CHANNEL_ID}>!`)
             : interaction.reply("Error sending statistic!");
     }
     else if (interaction.commandName == "show_month_overview") {
         //Displays month overview
-        (await (0, statisticsManager_1.showMonthStatistic)().then())
+        (await (0, statisticsManager_1.showMonthStatistic)())
             ? interaction.reply(`Monthly statistic sent to <#${process.env.CHANNEL_ID}>!`)
             : interaction.reply("Error sending statistic!");
     }
@@ -84,17 +91,19 @@ exports.client.on("interactionCreate", async (interaction) => {
 //VoiceState listener
 exports.client.on("voiceStateUpdate", (oldState, newState) => {
     if (oldState.member && newState.member) {
-        if (!(newState.member.id in (0, dataManager_1.getJSONContent)(constants_1.USER_TIMES_PATH)))
+        const trackedUsers = (0, dataManager_1.getJSONContent)(constants_1.USER_TIMES_PATH) || {};
+        if (!(newState.member.id in trackedUsers))
             return;
         if (!oldState.channel && newState.channel) {
             //New join
-            (0, dataManager_1.addJoinTime)(oldState.member.id, new Date());
+            const added = (0, dataManager_1.addJoinTime)(oldState.member.id, new Date());
+            (0, statisticsManager_1.sendDebugMessage)(`User ${oldState.member.displayName} joined a channel at ${new Date()}`, "Error adding join time", added);
         }
         if (oldState.channel && !newState.channel) {
             //Leaves channel
-            (0, dataManager_1.addUserTime)(oldState.member.id, new Date());
+            const added = (0, dataManager_1.addUserTime)(oldState.member.id, new Date());
+            (0, statisticsManager_1.sendDebugMessage)(`User ${oldState.member.displayName} left a channel at ${new Date()}`, "Error adding time", added);
         }
     }
 });
-(0, scheduler_1.startScheduler)();
 exports.client.login(process.env.BOT_TOKEN);

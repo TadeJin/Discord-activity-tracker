@@ -10,18 +10,24 @@ import {
 
 export const startScheduler = (): boolean => {
     try {
-        //Every Monday midnight
-        cron.schedule("0 0 * * 1", () => {
-            showWeekStatistic();
-            addWeeklySum();
-            clearTimeValuesOfUsers(USER_TIMES_PATH);
-        });
+        cron.schedule("0 0 * * *", () => {
+            const now = new Date();
+            const dayOfWeek = now.getDay();
+            const dayOfMonth = now.getDate();
 
-        //First of the month midnight
-        cron.schedule("0 0 1 * *", () => {
-            showMonthStatistic();
-            clearTimeValuesOfUsers(USER_TIMES_PATH);
-            clearTimeValuesOfUsers(MONTH_TIMES_PATH);
+            if (dayOfWeek == 1 && dayOfMonth == 1) {
+                showMonthStatistic();
+                clearTimeValuesOfUsers(USER_TIMES_PATH);
+                clearTimeValuesOfUsers(MONTH_TIMES_PATH);
+            } else if (dayOfWeek == 1) {
+                showWeekStatistic();
+                addWeeklySum();
+                clearTimeValuesOfUsers(USER_TIMES_PATH);
+            } else if (dayOfMonth == 1) {
+                showMonthStatistic();
+                clearTimeValuesOfUsers(USER_TIMES_PATH);
+                clearTimeValuesOfUsers(MONTH_TIMES_PATH);
+            }
         });
     } catch (error) {
         console.error(error);

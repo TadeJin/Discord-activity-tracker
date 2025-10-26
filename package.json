@@ -1,7 +1,7 @@
 {
   "name": "discord-activity-tracker-bot",
   "version": "1.0.0",
-  "main": "dist/src/index.js",
+  "main": "dist/index.js",
   "scripts": {
     "dev": "tsx watch src/index.ts",
     "build": "tsc",
