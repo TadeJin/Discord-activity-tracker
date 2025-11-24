@@ -7,6 +7,7 @@ import {
     clearTimeValuesOfUsers,
     showMonthStatistic,
 } from "./statisticsManager";
+import { addOverflows } from "./dataManager";
 
 export const startScheduler = (): boolean => {
     try {
@@ -25,6 +26,7 @@ export const startScheduler = (): boolean => {
                 clearTimeValuesOfUsers(USER_TIMES_PATH);
             } else if (dayOfMonth == 1) {
                 showMonthStatistic();
+                addOverflows();
                 clearTimeValuesOfUsers(MONTH_TIMES_PATH);
             }
         });

@@ -3,6 +3,10 @@ import { ApplicationCommandOptionType, REST, Routes } from "discord.js";
 
 const commands = [
     {
+        name: "hey",
+        description: "Says hello",
+    },
+    {
         name: "update_commands",
         description: "Updates commands, including their options",
     },

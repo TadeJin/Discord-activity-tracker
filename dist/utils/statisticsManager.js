@@ -17,8 +17,10 @@ const showWeekStatistic = async () => {
             let total = 0;
             for (const userID in userTime) {
                 const usertimeSpent = Number(userTime[userID].time);
-                message += `<@${userID}> spent${formatTimeData(usertimeSpent)} in call\n`;
-                total += usertimeSpent;
+                if (usertimeSpent > 0) {
+                    message += `<@${userID}> spent ${formatTimeData(usertimeSpent)} in call\n`;
+                    total += usertimeSpent;
+                }
             }
             message += `Total time spend in call this week is ${formatTimeData(total)}. Thanks for your attention :)`;
             if (process.env.CHANNEL_ID) {
@@ -44,8 +46,10 @@ const showMonthStatistic = async () => {
             for (const userID in monthlyTime) {
                 const usertimeSpent = Number(monthlyTime[userID].time) +
                     Number(userTime[userID].time);
-                message += `<@${userID}>spent ${formatTimeData(usertimeSpent)} in call\n`;
-                total += usertimeSpent;
+                if (usertimeSpent > 0) {
+                    message += `<@${userID}> spent ${formatTimeData(usertimeSpent)} in call\n`;
+                    total += usertimeSpent;
+                }
             }
             message += `Total time spend in call this month is ${formatTimeData(total)}. Thanks for your attention :)`;
             if (process.env.CHANNEL_ID) {
@@ -84,7 +88,7 @@ const addWeeklySum = () => {
         for (const userID in userTime) {
             monthlyTime[userID] = {
                 time: (Number(monthlyTime[userID].time) +
-                    Number(userTime[userID].time)).toString(),
+                    Number(userTime[userID].time) - Number(userTime[userID].overflow)).toString(),
             };
         }
         fs_1.default.writeFileSync(constants_1.MONTH_TIMES_PATH, JSON.stringify(monthlyTime), "utf-8");
@@ -134,10 +138,15 @@ const formatTimeData = (data) => {
     if (data != 0) {
         seconds = data;
     }
-    if (hours == 0 && minutes == 0 && seconds == 0) {
-        return " NO_DATA";
+    if (hours === 0 && minutes === 0 && seconds === 0) {
+        return "NO_DATA";
     }
-    else {
-        return `${hours > 0 ? hours + " hours " : ""} ${minutes > 0 ? minutes + " minutes " : ""}${seconds > 0 ? seconds + " seconds" : ""}`;
-    }
+    const parts = [];
+    if (hours > 0)
+        parts.push(`${hours} ${hours === 1 ? "hour" : "hours"}`);
+    if (minutes > 0)
+        parts.push(`${minutes} ${minutes === 1 ? "minute" : "minutes"}`);
+    if (seconds > 0)
+        parts.push(`${seconds} ${seconds === 1 ? "second" : "seconds"}`);
+    return parts.join(" ");
 };

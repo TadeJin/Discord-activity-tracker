@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.removeUser = exports.addNewUser = exports.addUserTime = exports.addJoinTime = exports.createFileIfNotExists = exports.createFolderIfNotExists = exports.getJSONContent = void 0;
+exports.removeUser = exports.addOverflows = exports.addNewUser = exports.addUserTime = exports.addJoinTime = exports.createFileIfNotExists = exports.createFolderIfNotExists = exports.getJSONContent = void 0;
 const fs_1 = __importDefault(require("fs"));
 const constants_1 = require("./constants");
 const getJSONContent = (filePath) => {
@@ -52,6 +52,7 @@ const addJoinTime = (userID, time) => {
             userTimes[userID] = {
                 time: userTimes[userID].time,
                 join_time: time,
+                overflow: userTimes[userID].overflow
             };
             fs_1.default.writeFileSync(constants_1.USER_TIMES_PATH, JSON.stringify(userTimes), "utf-8");
             return true;
@@ -76,6 +77,7 @@ const addUserTime = (userID, timeLeft) => {
             time: (Number(userTimes[userID].time) +
                 Math.floor((leaveTime - joinTime) / 1000)).toString(),
             join_time: "",
+            overflow: userTimes[userID].overflow
         };
         fs_1.default.writeFileSync(constants_1.USER_TIMES_PATH, JSON.stringify(userTimes), "utf-8");
         return true;
@@ -84,7 +86,6 @@ const addUserTime = (userID, timeLeft) => {
         console.log(error);
         return false;
     }
-    return true;
 };
 exports.addUserTime = addUserTime;
 //NEW USER
@@ -117,7 +118,7 @@ const addUserToTime = (userID) => {
     try {
         (0, exports.createFileIfNotExists)(constants_1.USER_TIMES_PATH);
         const userTimes = (0, exports.getJSONContent)(constants_1.USER_TIMES_PATH);
-        userTimes[userID] = { time: "0", join_time: "" };
+        userTimes[userID] = { time: "0", join_time: "", overflow: "0" };
         fs_1.default.writeFileSync(constants_1.USER_TIMES_PATH, JSON.stringify(userTimes), "utf-8");
         return true;
     }
@@ -126,6 +127,21 @@ const addUserToTime = (userID) => {
         return false;
     }
 };
+const addOverflows = () => {
+    try {
+        const userTimes = (0, exports.getJSONContent)(constants_1.USER_TIMES_PATH);
+        for (const userID in userTimes) {
+            userTimes[userID] = { time: userTimes[userID].time, join_time: userTimes[userID].join_time, overflow: userTimes[userID].time };
+        }
+        fs_1.default.writeFileSync(constants_1.USER_TIMES_PATH, JSON.stringify(userTimes), "utf-8");
+        return true;
+    }
+    catch (error) {
+        console.error(error);
+        return false;
+    }
+};
+exports.addOverflows = addOverflows;
 //REMOVING USER
 const removeUser = (userID) => {
     try {

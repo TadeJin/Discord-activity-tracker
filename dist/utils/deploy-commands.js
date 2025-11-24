@@ -5,6 +5,10 @@ require("dotenv/config");
 const discord_js_1 = require("discord.js");
 const commands = [
     {
+        name: "hey",
+        description: "Says hello",
+    },
+    {
         name: "update_commands",
         description: "Updates commands, including their options",
     },

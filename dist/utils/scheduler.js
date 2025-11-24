@@ -8,6 +8,7 @@ exports.startScheduler = void 0;
 const node_cron_1 = __importDefault(require("node-cron"));
 const constants_1 = require("./constants");
 const statisticsManager_1 = require("./statisticsManager");
+const dataManager_1 = require("./dataManager");
 const startScheduler = () => {
     try {
         node_cron_1.default.schedule("0 0 * * *", () => {
@@ -26,7 +27,7 @@ const startScheduler = () => {
             }
             else if (dayOfMonth == 1) {
                 (0, statisticsManager_1.showMonthStatistic)();
-                (0, statisticsManager_1.clearTimeValuesOfUsers)(constants_1.USER_TIMES_PATH);
+                (0, dataManager_1.addOverflows)();
                 (0, statisticsManager_1.clearTimeValuesOfUsers)(constants_1.MONTH_TIMES_PATH);
             }
         });

@@ -108,7 +108,7 @@ export const addWeeklySum = (): boolean => {
             monthlyTime[userID] = {
                 time: (
                     Number(monthlyTime[userID].time) +
-                    Number(userTime[userID].time)
+                    Number(userTime[userID].time) - Number(userTime[userID].overflow)
                 ).toString(),
             };
         }

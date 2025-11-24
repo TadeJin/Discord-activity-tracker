@@ -1,6 +1,7 @@
 type userTime = {
     time: string;
     join_time: Date | string;
+    overflow: string;
 };
 
 type monthlyTime = {

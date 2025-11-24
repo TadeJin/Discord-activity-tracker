@@ -50,6 +50,7 @@ export const addJoinTime = (userID: string, time: Date): boolean => {
             userTimes[userID] = {
                 time: userTimes[userID].time,
                 join_time: time,
+                overflow: userTimes[userID].overflow
             };
 
             fs.writeFileSync(
@@ -83,6 +84,7 @@ export const addUserTime = (userID: string, timeLeft: Date): boolean => {
                 Math.floor((leaveTime - joinTime) / 1000)
             ).toString(),
             join_time: "",
+            overflow: userTimes[userID].overflow
         };
 
         fs.writeFileSync(USER_TIMES_PATH, JSON.stringify(userTimes), "utf-8");
@@ -92,8 +94,6 @@ export const addUserTime = (userID: string, timeLeft: Date): boolean => {
         console.log(error);
         return false;
     }
-
-    return true;
 };
 
 //NEW USER
@@ -132,8 +132,25 @@ const addUserToTime = (userID: string): boolean => {
 
         const userTimes = getJSONContent(USER_TIMES_PATH) as userTimeJSON;
 
-        userTimes[userID] = { time: "0", join_time: "" };
+        userTimes[userID] = { time: "0", join_time: "", overflow: "0" };
 
+        fs.writeFileSync(USER_TIMES_PATH, JSON.stringify(userTimes), "utf-8");
+        return true;
+    } catch (error) {
+        console.error(error);
+        return false;
+    }
+};
+
+export const addOverflows = (): boolean => {
+    try {
+
+        const userTimes = getJSONContent(USER_TIMES_PATH) as userTimeJSON;
+        
+        for (const userID in userTimes) {
+            userTimes[userID] = { time: userTimes[userID].time, join_time: userTimes[userID].join_time, overflow: userTimes[userID].time };
+        }
+        
         fs.writeFileSync(USER_TIMES_PATH, JSON.stringify(userTimes), "utf-8");
         return true;
     } catch (error) {
