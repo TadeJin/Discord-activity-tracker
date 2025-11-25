@@ -44,6 +44,10 @@ const commands = [
         name: "show_month_overview",
         description: "Shows the current month overview",
     },
+    {
+        name: "show_tracked",
+        description: "Shows what users are currently tracked",
+    },
 ];
 const updateCommands = async () => {
     const botID = process.env.BOT_ID;

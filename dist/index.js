@@ -8,6 +8,7 @@ const deploy_commands_1 = require("./utils/deploy-commands");
 const statisticsManager_1 = require("./utils/statisticsManager");
 const constants_1 = require("./utils/constants");
 const scheduler_1 = require("./utils/scheduler");
+const userManager_1 = require("./utils/userManager");
 exports.client = new discord_js_1.Client({
     intents: [
         discord_js_1.IntentsBitField.Flags.Guilds,
@@ -58,7 +59,7 @@ exports.client.on("interactionCreate", async (interaction) => {
             interaction.reply("No name provided");
         }
         else {
-            (0, dataManager_1.addNewUser)(chosenUser.id)
+            (0, userManager_1.addNewUser)(chosenUser.id)
                 ? interaction.reply(`User ${chosenUser} added`)
                 : interaction.reply("Error adding user!");
         }
@@ -70,7 +71,7 @@ exports.client.on("interactionCreate", async (interaction) => {
             interaction.reply("No name provided");
         }
         else {
-            (0, dataManager_1.removeUser)(chosenUser.id)
+            (0, userManager_1.removeUser)(chosenUser.id)
                 ? interaction.reply(`User ${chosenUser} removed`)
                 : interaction.reply("Error removing user!");
         }
@@ -86,6 +87,10 @@ exports.client.on("interactionCreate", async (interaction) => {
         (await (0, statisticsManager_1.showMonthStatistic)())
             ? interaction.reply(`Monthly statistic sent to <#${process.env.CHANNEL_ID}>!`)
             : interaction.reply("Error sending statistic!");
+    }
+    else if (interaction.commandName == "show_tracked") {
+        const reply = await (0, userManager_1.showTrackedUsers)();
+        interaction.reply(reply);
     }
 });
 //VoiceState listener

@@ -8,12 +8,10 @@ import {
 } from "discord.js";
 import {
     addJoinTime,
-    addNewUser,
     addUserTime,
     createFileIfNotExists,
     createFolderIfNotExists,
     getJSONContent,
-    removeUser,
 } from "./utils/dataManager";
 import { updateCommands } from "./utils/deploy-commands";
 import {
@@ -27,6 +25,7 @@ import {
     USER_TIMES_PATH,
 } from "./utils/constants";
 import { startScheduler } from "./utils/scheduler";
+import { addNewUser, removeUser, showTrackedUsers } from "./utils/userManager";
 
 export const client = new Client({
     intents: [
@@ -117,6 +116,10 @@ client.on("interactionCreate", async (interaction: Interaction) => {
                   `Monthly statistic sent to <#${process.env.CHANNEL_ID}>!`
               )
             : interaction.reply("Error sending statistic!");
+    } else if (interaction.commandName == "show_tracked") {
+        const reply = await showTrackedUsers();
+
+        interaction.reply(reply);
     }
 });
 

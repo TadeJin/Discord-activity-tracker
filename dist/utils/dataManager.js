@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.removeUser = exports.addOverflows = exports.addNewUser = exports.addUserTime = exports.addJoinTime = exports.createFileIfNotExists = exports.createFolderIfNotExists = exports.getJSONContent = void 0;
+exports.addOverflows = exports.removeUserFromJSON = exports.addUserToTime = exports.addUserToMonth = exports.addUserTime = exports.addJoinTime = exports.createFileIfNotExists = exports.createFolderIfNotExists = exports.getJSONContent = void 0;
 const fs_1 = __importDefault(require("fs"));
 const constants_1 = require("./constants");
 const getJSONContent = (filePath) => {
@@ -88,19 +88,6 @@ const addUserTime = (userID, timeLeft) => {
     }
 };
 exports.addUserTime = addUserTime;
-//NEW USER
-const addNewUser = (userID) => {
-    try {
-        return ((0, exports.createFolderIfNotExists)(constants_1.DATA_FOLDER_PATH) &&
-            addUserToTime(userID) &&
-            addUserToMonth(userID));
-    }
-    catch (error) {
-        console.log(error);
-        return false;
-    }
-};
-exports.addNewUser = addNewUser;
 const addUserToMonth = (userID) => {
     try {
         (0, exports.createFileIfNotExists)(constants_1.MONTH_TIMES_PATH);
@@ -114,6 +101,7 @@ const addUserToMonth = (userID) => {
         return false;
     }
 };
+exports.addUserToMonth = addUserToMonth;
 const addUserToTime = (userID) => {
     try {
         (0, exports.createFileIfNotExists)(constants_1.USER_TIMES_PATH);
@@ -127,6 +115,22 @@ const addUserToTime = (userID) => {
         return false;
     }
 };
+exports.addUserToTime = addUserToTime;
+const removeUserFromJSON = (userID, filepath) => {
+    try {
+        const userTimes = (0, exports.getJSONContent)(filepath);
+        if (!userTimes[userID])
+            return false;
+        delete userTimes[userID];
+        fs_1.default.writeFileSync(filepath, JSON.stringify(userTimes), "utf-8");
+        return true;
+    }
+    catch (error) {
+        console.error(error);
+        return false;
+    }
+};
+exports.removeUserFromJSON = removeUserFromJSON;
 const addOverflows = () => {
     try {
         const userTimes = (0, exports.getJSONContent)(constants_1.USER_TIMES_PATH);
@@ -142,29 +146,3 @@ const addOverflows = () => {
     }
 };
 exports.addOverflows = addOverflows;
-//REMOVING USER
-const removeUser = (userID) => {
-    try {
-        return (removeUserFromJSON(userID, constants_1.USER_TIMES_PATH) &&
-            removeUserFromJSON(userID, constants_1.MONTH_TIMES_PATH));
-    }
-    catch (error) {
-        console.log(error);
-        return false;
-    }
-};
-exports.removeUser = removeUser;
-const removeUserFromJSON = (userID, filepath) => {
-    try {
-        const userTimes = (0, exports.getJSONContent)(filepath);
-        if (!userTimes[userID])
-            return false;
-        delete userTimes[userID];
-        fs_1.default.writeFileSync(filepath, JSON.stringify(userTimes), "utf-8");
-        return true;
-    }
-    catch (error) {
-        console.error(error);
-        return false;
-    }
-};

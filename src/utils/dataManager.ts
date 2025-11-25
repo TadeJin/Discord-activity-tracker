@@ -1,6 +1,5 @@
 import fs from "fs";
 import {
-    DATA_FOLDER_PATH,
     MONTH_TIMES_PATH,
     USER_TIMES_PATH,
 } from "./constants";
@@ -96,21 +95,7 @@ export const addUserTime = (userID: string, timeLeft: Date): boolean => {
     }
 };
 
-//NEW USER
-export const addNewUser = (userID: string): boolean => {
-    try {
-        return (
-            createFolderIfNotExists(DATA_FOLDER_PATH) &&
-            addUserToTime(userID) &&
-            addUserToMonth(userID)
-        );
-    } catch (error) {
-        console.log(error);
-        return false;
-    }
-};
-
-const addUserToMonth = (userID: string): boolean => {
+export const addUserToMonth = (userID: string): boolean => {
     try {
         createFileIfNotExists(MONTH_TIMES_PATH);
 
@@ -126,7 +111,7 @@ const addUserToMonth = (userID: string): boolean => {
     }
 };
 
-const addUserToTime = (userID: string): boolean => {
+export const addUserToTime = (userID: string): boolean => {
     try {
         createFileIfNotExists(USER_TIMES_PATH);
 
@@ -142,6 +127,21 @@ const addUserToTime = (userID: string): boolean => {
     }
 };
 
+export const removeUserFromJSON = (userID: string, filepath: string): boolean => {
+    try {
+        const userTimes = getJSONContent(filepath) as botData;
+        if (!userTimes[userID]) return false;
+        delete userTimes[userID];
+
+        fs.writeFileSync(filepath, JSON.stringify(userTimes), "utf-8");
+        return true;
+    } catch (error) {
+        console.error(error);
+        return false;
+    }
+};
+
+
 export const addOverflows = (): boolean => {
     try {
 
@@ -152,33 +152,6 @@ export const addOverflows = (): boolean => {
         }
         
         fs.writeFileSync(USER_TIMES_PATH, JSON.stringify(userTimes), "utf-8");
-        return true;
-    } catch (error) {
-        console.error(error);
-        return false;
-    }
-};
-
-//REMOVING USER
-export const removeUser = (userID: string): boolean => {
-    try {
-        return (
-            removeUserFromJSON(userID, USER_TIMES_PATH) &&
-            removeUserFromJSON(userID, MONTH_TIMES_PATH)
-        );
-    } catch (error) {
-        console.log(error);
-        return false;
-    }
-};
-
-const removeUserFromJSON = (userID: string, filepath: string): boolean => {
-    try {
-        const userTimes = getJSONContent(filepath) as botData;
-        if (!userTimes[userID]) return false;
-        delete userTimes[userID];
-
-        fs.writeFileSync(filepath, JSON.stringify(userTimes), "utf-8");
         return true;
     } catch (error) {
         console.error(error);

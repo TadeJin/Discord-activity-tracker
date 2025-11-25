@@ -42,6 +42,10 @@ const commands = [
         name: "show_month_overview",
         description: "Shows the current month overview",
     },
+    {
+        name: "show_tracked",
+        description: "Shows what users are currently tracked",
+    },
 ];
 
 export const updateCommands = async (): Promise<boolean> => {
