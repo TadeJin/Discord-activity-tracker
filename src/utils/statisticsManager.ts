@@ -186,9 +186,13 @@ export const sendDebugMessage = (
 ) => {
     if (process.env.DEBUG_CHANNEL_ID) {
         if (condition) {
-            sendMessageToChannel(successMessage, process.env.DEBUG_CHANNEL_ID);
+            if (successMessage != "") {
+                sendMessageToChannel(successMessage, process.env.DEBUG_CHANNEL_ID);
+            }
         } else {
-            sendMessageToChannel(errorMessage, process.env.DEBUG_CHANNEL_ID);
+            if (errorMessage != "") {
+                sendMessageToChannel(errorMessage, process.env.DEBUG_CHANNEL_ID);
+            }
         }
     }
 };

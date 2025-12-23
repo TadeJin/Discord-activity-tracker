@@ -39,9 +39,10 @@ export const client = new Client({
 
 client.on("clientReady", (c) => {
     console.log(`${c.user.tag} is online.`);
+    sendDebugMessage(`<@${c.user.id}> is online.`, "", true)
     // Automatic statistics printing (disable by commenting out)
     sendDebugMessage(
-        "Automatic statistics enabled",
+        "",
         "Error starting automatic statistics",
         startScheduler()
     );
@@ -51,7 +52,7 @@ client.on("clientReady", (c) => {
         createFileIfNotExists(MONTH_TIMES_PATH);
 
     sendDebugMessage(
-        "Data is correct",
+        "",
         "Error creating files",
         createBotDataIfNotExists
     );

@@ -20,12 +20,13 @@ exports.client = new discord_js_1.Client({
 });
 exports.client.on("clientReady", (c) => {
     console.log(`${c.user.tag} is online.`);
+    (0, statisticsManager_1.sendDebugMessage)(`<@${c.user.id}> is online.`, "", true);
     // Automatic statistics printing (disable by commenting out)
-    (0, statisticsManager_1.sendDebugMessage)("Automatic statistics enabled", "Error starting automatic statistics", (0, scheduler_1.startScheduler)());
+    (0, statisticsManager_1.sendDebugMessage)("", "Error starting automatic statistics", (0, scheduler_1.startScheduler)());
     const createBotDataIfNotExists = (0, dataManager_1.createFolderIfNotExists)(constants_1.DATA_FOLDER_PATH) &&
         (0, dataManager_1.createFileIfNotExists)(constants_1.USER_TIMES_PATH) &&
         (0, dataManager_1.createFileIfNotExists)(constants_1.MONTH_TIMES_PATH);
-    (0, statisticsManager_1.sendDebugMessage)("Data is correct", "Error creating files", createBotDataIfNotExists);
+    (0, statisticsManager_1.sendDebugMessage)("", "Error creating files", createBotDataIfNotExists);
 });
 //Chat commands
 exports.client.on("messageCreate", (message) => {

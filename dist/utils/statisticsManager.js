@@ -151,10 +151,14 @@ exports.sendMessageToChannel = sendMessageToChannel;
 const sendDebugMessage = (successMessage, errorMessage, condition) => {
     if (process.env.DEBUG_CHANNEL_ID) {
         if (condition) {
-            (0, exports.sendMessageToChannel)(successMessage, process.env.DEBUG_CHANNEL_ID);
+            if (successMessage != "") {
+                (0, exports.sendMessageToChannel)(successMessage, process.env.DEBUG_CHANNEL_ID);
+            }
         }
         else {
-            (0, exports.sendMessageToChannel)(errorMessage, process.env.DEBUG_CHANNEL_ID);
+            if (errorMessage != "") {
+                (0, exports.sendMessageToChannel)(errorMessage, process.env.DEBUG_CHANNEL_ID);
+            }
         }
     }
 };
