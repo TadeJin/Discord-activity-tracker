@@ -5,9 +5,13 @@ import fs from "fs";
 import { MONTH_TIMES_PATH, USER_TIMES_PATH } from "./constants";
 import { botData, monthlyTimeJSON, userTimeJSON } from "./types";
 
-export const showWeekStatistic = async (): Promise<boolean> => {
+export const showWeekStatistic = async (channel_ID: string | undefined): Promise<boolean> => {
     //Returns the weekly sum message
     try {
+        if (!channel_ID) {
+            throw new Error("Undefined channel ID!");
+        }
+
         const userTime = getJSONContent(USER_TIMES_PATH) as userTimeJSON;
         if (userTime) {
             let message = "Hello! The weekly sum of calls is here:\n";
@@ -28,7 +32,7 @@ export const showWeekStatistic = async (): Promise<boolean> => {
             if (process.env.CHANNEL_ID) {
                 return await sendMessageToChannel(
                     message,
-                    process.env.CHANNEL_ID
+                    channel_ID
                 );
             }
         }
@@ -40,9 +44,13 @@ export const showWeekStatistic = async (): Promise<boolean> => {
     }
 };
 
-export const showMonthStatistic = async (): Promise<boolean> => {
+export const showMonthStatistic = async (channel_ID: string | undefined): Promise<boolean> => {
     //Returns the monthly sum message
     try {
+        if (!channel_ID) {
+            throw new Error("Undefined channel ID!");
+        }
+
         const monthlyTime = getJSONContent(MONTH_TIMES_PATH) as monthlyTimeJSON;
         const userTime = getJSONContent(USER_TIMES_PATH) as userTimeJSON;
 
@@ -69,7 +77,7 @@ export const showMonthStatistic = async (): Promise<boolean> => {
             if (process.env.CHANNEL_ID) {
                 return await sendMessageToChannel(
                     message,
-                    process.env.CHANNEL_ID
+                    channel_ID
                 );
             }
         }

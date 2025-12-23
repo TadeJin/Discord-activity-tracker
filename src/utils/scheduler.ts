@@ -1,6 +1,5 @@
 //Automatic statistic calling
 import cron from "node-cron";
-import { USER_TIMES_PATH, MONTH_TIMES_PATH } from "./constants";
 import {
     showWeekStatistic,
     addWeeklySum,
@@ -18,15 +17,15 @@ export const startScheduler = (): boolean => {
             const dayOfMonth = now.getDate();
 
             if (dayOfWeek == 1 && dayOfMonth == 1) {
-                showMonthStatistic();
+                showMonthStatistic(process.env.CHANNEL_ID);
                 clearWeeklyValues()
                 clearMonthValues()
             } else if (dayOfWeek == 1) {
-                showWeekStatistic();
+                showWeekStatistic(process.env.CHANNEL_ID);
                 addWeeklySum();
                 clearWeeklyValues()
             } else if (dayOfMonth == 1) {
-                showMonthStatistic();
+                showMonthStatistic(process.env.CHANNEL_ID);
                 addOverflows();
                 clearMonthValues()
             }

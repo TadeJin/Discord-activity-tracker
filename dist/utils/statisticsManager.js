@@ -8,9 +8,12 @@ const __1 = require("..");
 const dataManager_1 = require("./dataManager");
 const fs_1 = __importDefault(require("fs"));
 const constants_1 = require("./constants");
-const showWeekStatistic = async () => {
+const showWeekStatistic = async (channel_ID) => {
     //Returns the weekly sum message
     try {
+        if (!channel_ID) {
+            throw new Error("Undefined channel ID!");
+        }
         const userTime = (0, dataManager_1.getJSONContent)(constants_1.USER_TIMES_PATH);
         if (userTime) {
             let message = "Hello! The weekly sum of calls is here:\n";
@@ -24,7 +27,7 @@ const showWeekStatistic = async () => {
             }
             message += `Total time spend in call this week is ${formatTimeData(total)}. Thanks for your attention :)`;
             if (process.env.CHANNEL_ID) {
-                return await (0, exports.sendMessageToChannel)(message, process.env.CHANNEL_ID);
+                return await (0, exports.sendMessageToChannel)(message, channel_ID);
             }
         }
         return false;
@@ -35,9 +38,12 @@ const showWeekStatistic = async () => {
     }
 };
 exports.showWeekStatistic = showWeekStatistic;
-const showMonthStatistic = async () => {
+const showMonthStatistic = async (channel_ID) => {
     //Returns the monthly sum message
     try {
+        if (!channel_ID) {
+            throw new Error("Undefined channel ID!");
+        }
         const monthlyTime = (0, dataManager_1.getJSONContent)(constants_1.MONTH_TIMES_PATH);
         const userTime = (0, dataManager_1.getJSONContent)(constants_1.USER_TIMES_PATH);
         if (monthlyTime && userTime) {
@@ -53,7 +59,7 @@ const showMonthStatistic = async () => {
             }
             message += `Total time spend in call this month is ${formatTimeData(total)}. Thanks for your attention :)`;
             if (process.env.CHANNEL_ID) {
-                return await (0, exports.sendMessageToChannel)(message, process.env.CHANNEL_ID);
+                return await (0, exports.sendMessageToChannel)(message, channel_ID);
             }
         }
         return false;

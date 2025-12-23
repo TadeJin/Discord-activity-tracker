@@ -15,17 +15,17 @@ const startScheduler = () => {
             const dayOfWeek = now.getDay();
             const dayOfMonth = now.getDate();
             if (dayOfWeek == 1 && dayOfMonth == 1) {
-                (0, statisticsManager_1.showMonthStatistic)();
+                (0, statisticsManager_1.showMonthStatistic)(process.env.CHANNEL_ID);
                 (0, statisticsManager_1.clearWeeklyValues)();
                 (0, statisticsManager_1.clearMonthValues)();
             }
             else if (dayOfWeek == 1) {
-                (0, statisticsManager_1.showWeekStatistic)();
+                (0, statisticsManager_1.showWeekStatistic)(process.env.CHANNEL_ID);
                 (0, statisticsManager_1.addWeeklySum)();
                 (0, statisticsManager_1.clearWeeklyValues)();
             }
             else if (dayOfMonth == 1) {
-                (0, statisticsManager_1.showMonthStatistic)();
+                (0, statisticsManager_1.showMonthStatistic)(process.env.CHANNEL_ID);
                 (0, dataManager_1.addOverflows)();
                 (0, statisticsManager_1.clearMonthValues)();
             }
