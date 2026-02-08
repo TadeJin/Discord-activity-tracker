@@ -1,13 +1,14 @@
 import { DATA_FOLDER_PATH, MONTH_TIMES_PATH, USER_TIMES_PATH } from "./constants";
-import { createFolderIfNotExists, getJSONContent, removeUserFromJSON, addUserToMonth, addUserToTime } from "./dataManager";
+import { createFolderIfNotExists, getJSONContent, removeUserFromJSON, addUserToMonth, addUserToTime, updateJoinTimeIfInChannel } from "./dataManager";
 import { userTimeJSON } from "./types";
 
-export const addNewUser = (userID: string): boolean => {
+export const addNewUser = async (userID: string): Promise<boolean> => {
     try {
         return (
             createFolderIfNotExists(DATA_FOLDER_PATH) &&
             addUserToTime(userID) &&
-            addUserToMonth(userID)
+            addUserToMonth(userID) &&
+            await updateJoinTimeIfInChannel(userID)
         );
     } catch (error) {
         console.log(error);

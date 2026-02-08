@@ -88,7 +88,7 @@ client.on("interactionCreate", async (interaction: Interaction) => {
         if (!chosenUser) {
             interaction.reply("No name provided");
         } else {
-            addNewUser(chosenUser.id)
+            await addNewUser(chosenUser.id)
                 ? interaction.reply(`User ${chosenUser} added`)
                 : interaction.reply("Error adding user!");
         }

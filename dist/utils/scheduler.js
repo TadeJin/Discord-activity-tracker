@@ -18,16 +18,19 @@ const startScheduler = () => {
                 (0, statisticsManager_1.showMonthStatistic)(process.env.CHANNEL_ID);
                 (0, statisticsManager_1.clearWeeklyValues)();
                 (0, statisticsManager_1.clearMonthValues)();
+                (0, dataManager_1.updateAllJoinTimesIfInChannel)();
             }
             else if (dayOfWeek == 1) {
                 (0, statisticsManager_1.showWeekStatistic)(process.env.CHANNEL_ID);
                 (0, statisticsManager_1.addWeeklySum)();
                 (0, statisticsManager_1.clearWeeklyValues)();
+                (0, dataManager_1.updateAllJoinTimesIfInChannel)();
             }
             else if (dayOfMonth == 1) {
                 (0, statisticsManager_1.showMonthStatistic)(process.env.CHANNEL_ID);
                 (0, dataManager_1.addOverflows)();
                 (0, statisticsManager_1.clearMonthValues)();
+                (0, dataManager_1.updateAllJoinTimesIfInChannel)();
             }
         });
     }

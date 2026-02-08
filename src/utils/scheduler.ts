@@ -7,7 +7,7 @@ import {
     clearMonthValues,
     clearWeeklyValues,
 } from "./statisticsManager";
-import { addOverflows } from "./dataManager";
+import { addOverflows, updateAllJoinTimesIfInChannel } from "./dataManager";
 
 export const startScheduler = (): boolean => {
     try {
@@ -20,14 +20,17 @@ export const startScheduler = (): boolean => {
                 showMonthStatistic(process.env.CHANNEL_ID);
                 clearWeeklyValues()
                 clearMonthValues()
+                updateAllJoinTimesIfInChannel()
             } else if (dayOfWeek == 1) {
                 showWeekStatistic(process.env.CHANNEL_ID);
                 addWeeklySum();
                 clearWeeklyValues()
+                updateAllJoinTimesIfInChannel()
             } else if (dayOfMonth == 1) {
                 showMonthStatistic(process.env.CHANNEL_ID);
                 addOverflows();
                 clearMonthValues()
+                updateAllJoinTimesIfInChannel()
             }
         });
     } catch (error) {

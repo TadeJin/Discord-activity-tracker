@@ -3,10 +3,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.addOverflows = exports.removeUserFromJSON = exports.addUserToTime = exports.addUserToMonth = exports.addUserTime = exports.addJoinTime = exports.createFileIfNotExists = exports.createFolderIfNotExists = exports.getJSONContent = void 0;
+exports.updateAllJoinTimesIfInChannel = exports.updateJoinTimeIfInChannel = exports.addOverflows = exports.removeUserFromJSON = exports.addUserToTime = exports.addUserToMonth = exports.addUserTime = exports.addJoinTime = exports.createFileIfNotExists = exports.createFolderIfNotExists = exports.getJSONContent = void 0;
 const fs_1 = __importDefault(require("fs"));
 const constants_1 = require("./constants");
 const statisticsManager_1 = require("./statisticsManager");
+const discord_js_1 = require("discord.js");
+const __1 = require("..");
+require("dotenv/config");
 const getJSONContent = (filePath) => {
     try {
         const fileContent = fs_1.default.readFileSync(filePath, "utf-8").trim();
@@ -153,3 +156,59 @@ const addOverflows = () => {
     }
 };
 exports.addOverflows = addOverflows;
+const getChannels = async () => {
+    if (!process.env.SERVER_ID) {
+        return new discord_js_1.Collection();
+    }
+    const guild = await __1.client.guilds.fetch(process.env.SERVER_ID);
+    return guild.channels.fetch();
+};
+const updateJoinTimeIfInChannel = async (userID) => {
+    if (!process.env.SERVER_ID) {
+        return false;
+    }
+    try {
+        const channels = await getChannels();
+        for (const channel of channels.values()) {
+            if (!channel || !channel.isVoiceBased()) {
+                continue;
+            }
+            if (channel.members.has(userID)) {
+                return (0, exports.addJoinTime)(userID, new Date());
+            }
+        }
+        return true;
+    }
+    catch (error) {
+        console.error(error);
+        return false;
+    }
+};
+exports.updateJoinTimeIfInChannel = updateJoinTimeIfInChannel;
+const updateAllJoinTimesIfInChannel = async () => {
+    if (!process.env.SERVER_ID) {
+        return false;
+    }
+    try {
+        const userTimes = (0, exports.getJSONContent)(constants_1.USER_TIMES_PATH);
+        const channels = await getChannels();
+        for (const channel of channels.values()) {
+            if (!channel || !channel.isVoiceBased()) {
+                continue;
+            }
+            for (const userID in userTimes) {
+                if (channel.members.has(userID)) {
+                    if (!(0, exports.addJoinTime)(userID, new Date())) {
+                        return false;
+                    }
+                }
+            }
+        }
+        return true;
+    }
+    catch (error) {
+        console.error(error);
+        return false;
+    }
+};
+exports.updateAllJoinTimesIfInChannel = updateAllJoinTimesIfInChannel;

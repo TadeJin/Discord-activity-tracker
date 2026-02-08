@@ -60,7 +60,7 @@ exports.client.on("interactionCreate", async (interaction) => {
             interaction.reply("No name provided");
         }
         else {
-            (0, userManager_1.addNewUser)(chosenUser.id)
+            await (0, userManager_1.addNewUser)(chosenUser.id)
                 ? interaction.reply(`User ${chosenUser} added`)
                 : interaction.reply("Error adding user!");
         }

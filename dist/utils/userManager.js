@@ -3,11 +3,12 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.showTrackedUsers = exports.removeUser = exports.addNewUser = void 0;
 const constants_1 = require("./constants");
 const dataManager_1 = require("./dataManager");
-const addNewUser = (userID) => {
+const addNewUser = async (userID) => {
     try {
         return ((0, dataManager_1.createFolderIfNotExists)(constants_1.DATA_FOLDER_PATH) &&
             (0, dataManager_1.addUserToTime)(userID) &&
-            (0, dataManager_1.addUserToMonth)(userID));
+            (0, dataManager_1.addUserToMonth)(userID) &&
+            await (0, dataManager_1.updateJoinTimeIfInChannel)(userID));
     }
     catch (error) {
         console.log(error);

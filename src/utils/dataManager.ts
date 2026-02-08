@@ -5,6 +5,9 @@ import {
 } from "./constants";
 import { botData, monthlyTimeJSON, userTimeJSON } from "./types";
 import { sendDebugMessage } from "./statisticsManager";
+import { Collection, Guild, NonThreadGuildBasedChannel } from "discord.js";
+import { client } from "..";
+import "dotenv/config";
 
 export const getJSONContent = (filePath: string): botData | {} | false => {
     try {
@@ -165,3 +168,68 @@ export const addOverflows = (): boolean => {
         return false;
     }
 };
+
+const getChannels = async (): Promise<Collection<string, NonThreadGuildBasedChannel | null>> => {
+    if (!process.env.SERVER_ID) {
+        return new Collection<string, null>();
+
+    }
+
+    const guild = await client.guilds.fetch(process.env.SERVER_ID)
+    return guild.channels.fetch()
+}
+
+export const updateJoinTimeIfInChannel = async (userID: string): Promise<boolean> => {
+    if (!process.env.SERVER_ID) {
+        return false
+    }
+
+    try {
+        const channels = await getChannels()
+
+        for (const channel of channels.values()) {
+            if (!channel || !channel.isVoiceBased()) {
+                continue
+            }
+
+            if (channel.members.has(userID)) {
+                return addJoinTime(userID, new Date())
+            }
+        }
+
+        return true;
+    } catch (error) {
+        console.error(error);
+        return false;
+    }
+}
+
+export const updateAllJoinTimesIfInChannel = async (): Promise<boolean> => {
+    if (!process.env.SERVER_ID) {
+        return false
+    }
+
+    try {
+        const userTimes = getJSONContent(USER_TIMES_PATH) as userTimeJSON;
+        const channels = await getChannels()
+
+        for (const channel of channels.values()) {
+            if (!channel || !channel.isVoiceBased()) {
+                continue
+            }
+
+            for (const userID in userTimes) {
+                if (channel.members.has(userID)) {
+                    if (!addJoinTime(userID, new Date())) {
+                        return false
+                    }
+                }
+            }
+        }
+
+        return true;
+    } catch (error) {
+        console.error(error);
+        return false;
+    }
+}
