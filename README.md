@@ -1,5 +1,5 @@
 # Discord call tracking bot
-This is code for a discord bot, that can track time spend in calls on discord. <br>
+This is code for a discord bot, that can track time spent in calls on discord. <br>
 The bot uses Discord.js library https://discord.js.org/
 
 ## Features
