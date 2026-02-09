@@ -129,7 +129,7 @@ export const clearWeeklyValues = (): boolean => {
         console.error(error);
         return false;
     }
-}
+};
 
 export const clearMonthValues = (): boolean => {
     //Clears the monthly time of all users to 0

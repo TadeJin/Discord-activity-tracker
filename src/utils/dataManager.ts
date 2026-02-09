@@ -5,7 +5,7 @@ import {
 } from "./constants";
 import { botData, monthlyTimeJSON, userTimeJSON } from "./types";
 import { sendDebugMessage } from "./statisticsManager";
-import { Collection, Guild, NonThreadGuildBasedChannel } from "discord.js";
+import { Collection, NonThreadGuildBasedChannel } from "discord.js";
 import { client } from "..";
 import "dotenv/config";
 
@@ -153,10 +153,8 @@ export const removeUserFromJSON = (userID: string, filepath: string): boolean =>
     }
 };
 
-
 export const addOverflows = (): boolean => {
     try {
-
         const userTimes = getJSONContent(USER_TIMES_PATH) as userTimeJSON;
         
         for (const userID in userTimes) {
@@ -179,7 +177,7 @@ const getChannels = async (): Promise<Collection<string, NonThreadGuildBasedChan
 
     const guild = await client.guilds.fetch(process.env.SERVER_ID)
     return guild.channels.fetch()
-}
+};
 
 export const updateJoinTimeIfInChannel = async (userID: string): Promise<boolean> => {
     if (!process.env.SERVER_ID) {
@@ -204,7 +202,7 @@ export const updateJoinTimeIfInChannel = async (userID: string): Promise<boolean
         console.error(error);
         return false;
     }
-}
+};
 
 export const updateAllJoinTimesIfInChannel = async (): Promise<boolean> => {
     if (!process.env.SERVER_ID) {
@@ -234,4 +232,4 @@ export const updateAllJoinTimesIfInChannel = async (): Promise<boolean> => {
         console.error(error);
         return false;
     }
-}
+};

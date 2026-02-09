@@ -76,7 +76,7 @@ const showMonthStatistic = async (channel_ID) => {
                 message += `Total time spend in call this month is ${formatTimeData(total)}. Thanks for your attention :)`;
             }
             else {
-                message += "No members were in a call this week. :(";
+                message += "No members were in a call this month. :(";
             }
             if (process.env.CHANNEL_ID) {
                 return await (0, exports.sendMessageToChannel)(message, channel_ID);
